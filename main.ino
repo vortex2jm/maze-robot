@@ -28,13 +28,11 @@
 #define KP 
 #define KI 
 #define KD 
-#define INPUT_PIN 
-#define OUT_PIN 
 
-double integral = 0;
-double dt = 0;
-double last_time = 0;
-double desired_output = 5;
+#define LEFT_MOTOR_SPEED
+#define RIGHT_MOTOR_SPEED
+
+int previous_error = 0;
 
 double pid(double error);
 
@@ -42,14 +40,13 @@ void setup() {
 }
 
 void loop() {
-  double now = millis();
-  dt = (now - last_time) / 1000.0;
-  last_time = now;
+  int error = calculate_error();
+  pid_output = pid(error);
+  previous_error = error;
 
-  double actual_output = map(analogRead(INPUT_PIN), 0, 1024, 0, 255);
-  double error = desired_output - actual_output;
-  output = pid(error);
-  analogWrite(OUT_PIN, output);
+  // NOTE: define pins
+  analogWrite(OUT_PIN_LEFT_MOTOR, LEFT_MOTOR_SPEED + pid_output);
+  analogWrite(OUT_PIN_RIGHT_MOTOR, RIGHT_MOTOR_SPEED - pid_output);
 
   delay(300);
 }
@@ -57,8 +54,32 @@ void loop() {
 double pid(double error) {
   double proportional = error;
   integral += error * dt; 
-  double derivative = (error - previous) / dt;
+  double derivative = error - previous_error;
   previous = error;
   double output = (KP * proportional) + (KI * integral) + (KD * derivative);
   return output;
+}
+
+// the sensor values will be saved on the lsb positions
+// the mask will be like: 000<SLC><SR><SC><SL><SRC>
+unsigned char get_line_sensors_bitmask() {
+  // change to analogRead
+  int slc_val = digitalRead(SLC);
+  int sr_val = digitalRead(SR);
+  int sc_val = digitalRead(SC);
+  int sl_val = digitalRead(SL);
+  int src_val = digitalRead(SRC);
+  
+  return (slc_val << 4) | (sr_val << 3) | (sc_val << 2) | (sl_val << 1) | src_val;
+}
+
+int calculate_error() {
+  int error = 0;
+  unsigned char bitmask = get_line_sensors_bitmask();
+
+  // think about the possible cases
+  switch (bitmask) {
+  }
+
+  return error;
 }
