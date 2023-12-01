@@ -11,3 +11,5 @@
  - [maze solver robot project on github](https://github.com/luongthecong123/Arduino-Maze-Solver/blob/main)
  - [New_Design_of_Line_Maze_Solving_Robot_with_Speed_Controller_and_Short_Path_Finder_Algorithm](https://www.researchgate.net/publication/335640730)
  - [maze solving robot with 3 ir sensors](https://www.hackster.io/Varun2905/maze-solving-robot-3-ir-sensors-9ada3b)
+
+- [HCS04 lib](https://github.com/gamegine/HCSR04-ultrasonic-sensor-lib)
