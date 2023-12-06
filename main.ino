@@ -16,6 +16,14 @@
 // Medium value between light sensors values
 #define TRESHOLD 2000
 
+#define KP 0.005
+
+int center_vertical_sensor_value=0;
+int left_sensor_value=0;
+int right_sensor_value=0;
+int center_left_sensor_value=0; 
+int center_right_sensor_value=0;
+
 //SETUP==================================================//
 void setup() {
   // Setting up pins
@@ -38,15 +46,19 @@ void setup() {
 
 //LOOP==================================================//
 void loop() {
-  int vertical_center_motor_val = analogRead(CENTER_VERTICAL_SENSOR);
-  Serial.println(vertical_center_motor_val);
-  
-  // is on a black cell
-  if (vertical_center_motor_val > TRESHOLD) {
-    analogWrite(CHA_M1, 170);
-    analogWrite(CHA_M2, 80);
-    delay(200);
-  }else {
+  center_vertical_sensor_value = analogRead(CENTER_VERTICAL_SENSOR);
+  left_sensor_value = analogRead(LEFT_SENSOR);
+  right_sensor_value = analogRead(RIGHT_SENSOR);
+  center_left_sensor_value = analogRead(CENTER_LEFT_SENSOR);
+  center_right_sensor_value = analogRead(CENTER_RIGHT_SENSOR); 
+
+  Serial.println(left_sensor_value, right_sensor_value);
+
+  analogWrite(CHA_M1, 160 + (KP * left_sensor_value));
+  analogWrite(CHA_M2,86 - (KP * right_sensor_value));
+  delay(100);
+
+  if(center_left_sensor_value > TRESHOLD || center_right_sensor_value > TRESHOLD){
     digitalWrite(EN_1, LOW);
     digitalWrite(EN_2, LOW);
   }
