@@ -1,101 +1,53 @@
-#define CENTER_LEFT_SENSOR 3 
-#define RIGHT_SENSOR 4
-#define CENTER_VERTICAL_SENSOR 5
-#define LEFT_SENSOR 6
-#define CENTER_RIGHT_SENSOR 7
+// Sensors
+#define CENTER_RIGHT_SENSOR 36
+#define RIGHT_SENSOR 39
+#define CENTER_VERTICAL_SENSOR 34
+#define LEFT_SENSOR 35
+#define CENTER_LEFT_SENSOR 32
 
-// located on H bridge
-#define E_CHI 8
-#define CHA_MI 9
-#define E_CH2 10
-#define CHA_M2 11
+// Right engine - 128 -> 255
+#define EN_1 33
+#define CHA_M1 25
 
-#define BUZZER 12
-#define SERVO 15
-#define MOSI 37
-#define TX0 35
-#define RX0 34
-#define CLK 30
+// Left engine - 128 -> 0
+#define EN_2 26
+#define CHA_M2 27
 
-// i2c acelerometer & giroscope
-#define SDA_MPU 33
-#define SCL_MPU 36
+// Medium value between light sensors values
+#define TRESHOLD 2000
 
-// enable sensors
-#define CS_SENSORS 29
-
-
-// general purpose enable
-#define EN_TRIG 27
-
-#define MISO_ECHO 31
-
-// lcd register select
-#define RS 28
-// power lcd
-#define RL_LCD 13
-
-// data bits lcd
-#define DB7 26
-#define DB6 25
-#define DB5 24
-#define DB4 23
-
-#define KP 
-#define KI 
-#define KD 
-
-#define LEFT_MOTOR_SPEED
-#define RIGHT_MOTOR_SPEED
-
-int previous_error = 0;
-
-double pid(double error);
-
+//SETUP==================================================//
 void setup() {
+  // Setting up pins
+  pinMode(CENTER_LEFT_SENSOR,INPUT);
+  pinMode(RIGHT_SENSOR,INPUT);
+  pinMode(CENTER_VERTICAL_SENSOR,INPUT);
+  pinMode(LEFT_SENSOR,INPUT);
+  pinMode(CENTER_RIGHT_SENSOR,INPUT);
+  pinMode(CHA_M1, OUTPUT);
+  pinMode(EN_1, OUTPUT);
+  pinMode(CHA_M2, OUTPUT);
+  pinMode(EN_2, OUTPUT);
+
+  // Enabling engines
+  digitalWrite(EN_1, HIGH);
+  digitalWrite(EN_2, HIGH);
+
+  Serial.begin(9600);
 }
 
+//LOOP==================================================//
 void loop() {
-  int error = calculate_error();
-  pid_output = pid(error);
-  previous_error = error;
-
-  // NOTE: define pins
-  analogWrite(OUT_PIN_LEFT_MOTOR, LEFT_MOTOR_SPEED + pid_output);
-  analogWrite(OUT_PIN_RIGHT_MOTOR, RIGHT_MOTOR_SPEED - pid_output);
-
-  delay(300);
-}
-
-double pid(double error) {
-  double proportional = error;
-  integral += error * dt; 
-  double derivative = error - previous_error;
-  previous = error;
-  double output = (KP * proportional) + (KI * integral) + (KD * derivative);
-  return output;
-}
-
-// the sensor values will be saved on the lsb positions
-// the mask will be like: 000<SLC><SR><SC><SL><SRC>
-unsigned char get_line_sensors_bitmask() {
-  // change to analogRead
-  int slc_val = digitalRead(CENTER_LEFT_SENSOR);
-  int sr_val = digitalRead(RIGHT_SENSOR );
-  int sc_val = digitalRead(CENTER_VERTICAL_SENSOR);
-  int sl_val = digitalRead(LEFT_SENSOR);
-  int src_val = digitalRead(CENTER_RIGHT_SENSOR );
+  int vertical_center_motor_val = analogRead(CENTER_VERTICAL_SENSOR);
+  Serial.println(vertical_center_motor_val);
   
-  return (slc_val << 4) | (sr_val << 3) | (sc_val << 2) | (sl_val << 1) | src_val;
-}
-
-int calculate_error() {
-  int error = 0;
-  unsigned char bitmask = get_line_sensors_bitmask();
-
-  // think about the possible cases
-  switch (bitmask) {
+  // is on a black cell
+  if (vertical_center_motor_val > TRESHOLD) {
+    analogWrite(CHA_M1, 170);
+    analogWrite(CHA_M2, 80);
+    delay(200);
+  }else {
+    digitalWrite(EN_1, LOW);
+    digitalWrite(EN_2, LOW);
   }
-
-  return error;
 }
