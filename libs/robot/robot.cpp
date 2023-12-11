@@ -4,11 +4,11 @@
 // Right engine - 128 -> 255
 // Left engine - 128 -> 0
 #define KP 0.005        
-#define BASE_PWM_M2 90  //81  old values
-#define BASE_PWM_M1 161 //170 old values
+#define BASE_PWM_M2 91  //81  old values
+#define BASE_PWM_M1 160 //170 old values
 #define ENGINE_STOP 128
 #define THRESHOLD 2000
-#define DISTANCE_LIMIT 25
+#define DISTANCE_LIMIT 40
 
 //CONSTRUCTOR============================================================//
 Robot::Robot(
@@ -119,7 +119,7 @@ void Robot::rotate_180deg(){
   this->giroscope.update();
   this->previous_rotation_state = this->giroscope.getAngleZ();
   double current_angle = this->previous_rotation_state;
-  while(current_angle > (this->previous_rotation_state - 150)){
+  while(current_angle > (this->previous_rotation_state - 165)){
     this->giroscope.update();
     current_angle = this->giroscope.getAngleZ();
     this->set_engine_pwm(this->base_pwm_m2, this->base_pwm_m2);
@@ -130,8 +130,7 @@ void Robot::rotate_180deg(){
 //============================================================//
 float Robot::read_distance(){
   float distance = this->ultrasonic.read(CM);
-  Serial.println(distance);
-  delay(100);
+  delay(200);
   return distance;
 }
 
@@ -155,10 +154,8 @@ bool Robot::check_wall(WallDirection d){
     default:
       break;
     }
+  delay(500);
   float distance = this->read_distance();
-  Serial.print("distance: ");
-  Serial.println(distance);
-  delay(100);
   if((int)distance < DISTANCE_LIMIT){
     return true;
   }

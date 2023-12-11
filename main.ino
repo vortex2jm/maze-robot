@@ -44,9 +44,10 @@ void setup() {
 
 // Main loop=========================================//
 void loop() {
+  
   robot.read_line_sensors();
   RobotState state = robot.check_line_sensors_states();
-
+  
   switch (state) {
     case GO_FORWARD:
       robot.go_forward();
@@ -54,7 +55,7 @@ void loop() {
 
     case FOUR_WAY_CROSSING:
       robot.stop();
-      if(!robot.check_wall(RIGHT)){
+      if(!robot.check_wall(RIGHT)){        
         delay(100);
         robot.rotate_right_90deg(); 
       } else if(!robot.check_wall(FRONT)){
@@ -65,48 +66,6 @@ void loop() {
         robot.rotate_left_90deg();
       } else {
         delay(100);
-        robot.rotate_180deg();
-      }
-      robot.go_forward();
-      delay(500);
-      break;
-// 
-    case THREE_WAY_CROSSING:
-      if(!robot.check_wall(RIGHT)){
-        robot.rotate_right_90deg(); 
-      } else if(!robot.check_wall(FRONT)){
-        robot.go_forward();  
-      } else if(!robot.check_wall(LEFT)){
-        robot.rotate_left_90deg();
-      } else {
-        robot.rotate_180deg();
-      }
-      robot.go_forward();
-      delay(500);
-      break;
-
-    case TURN_LEFT:
-      if(!robot.check_wall(RIGHT)){
-        robot.rotate_right_90deg(); 
-      } else if(!robot.check_wall(FRONT)){
-        robot.go_forward();  
-      } else if(!robot.check_wall(LEFT)){
-        robot.rotate_left_90deg();
-      } else {
-        robot.rotate_180deg();
-      }
-      robot.go_forward();
-      delay(500);
-      break;
-
-    case TURN_RIGHT:
-      if(!robot.check_wall(RIGHT)){
-        robot.rotate_right_90deg(); 
-      } else if(!robot.check_wall(FRONT)){
-        robot.go_forward();  
-      } else if(!robot.check_wall(LEFT)){
-        robot.rotate_left_90deg();
-      } else {
         robot.rotate_180deg();
       }
       robot.go_forward();
