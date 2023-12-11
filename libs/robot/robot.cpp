@@ -8,6 +8,7 @@
 #define BASE_PWM_M1 161 //170 old values
 #define ENGINE_STOP 128
 #define THRESHOLD 2000
+#define DISTANCE_LIMIT 25
 
 //CONSTRUCTOR============================================================//
 Robot::Robot(
@@ -21,8 +22,9 @@ Robot::Robot(
   int chan_m1,
   int chan_m2,
   int echo,
-  int trigger
-) : giroscope(Wire), ultrasonic(trigger, echo) {
+  int trigger,
+  int servo
+) : giroscope(Wire), ultrasonic(trigger, echo), servo_motor() {
 
   this->line_sensors_pins[CENTER_VERTICAL_SENSOR] = center_vertical;
   this->line_sensors_pins[LEFT_SENSOR] =  left;
@@ -37,6 +39,7 @@ Robot::Robot(
   this->sensors_threshold = THRESHOLD;
   this->base_pwm_m1 = BASE_PWM_M1;
   this->base_pwm_m2 = BASE_PWM_M2;
+  this->servo_pin = servo;
 }
 
 //============================================================//
@@ -59,6 +62,10 @@ void Robot::setup() {
   delay(100);
   this->giroscope.calcOffsets(); // gyro and accelero
   
+  // Setting up servo motor
+  this->servo_motor.attach(this->servo_pin);
+  this->servo_rotate_front();
+
   // Wait 1 second until loop starts
   delay(1000);
   digitalWrite(this->en_m1, HIGH);
@@ -121,10 +128,41 @@ void Robot::rotate_180deg(){
 }
 
 //============================================================//
-void Robot::read_distance(){
+float Robot::read_distance(){
   float distance = this->ultrasonic.read(CM);
   Serial.println(distance);
   delay(100);
+  return distance;
+}
+
+//============================================================//
+void Robot::servo_rotate_front(){
+  this->servo_motor.write(90);
+}
+
+//============================================================//
+bool Robot::check_wall(WallDirection d){
+  switch (d) {
+    case RIGHT:
+      this->servo_motor.write(0);
+      break;
+    case LEFT:
+      this->servo_motor.write(180);
+      break;
+    case FRONT:
+      this->servo_motor.write(90);
+      break;
+    default:
+      break;
+    }
+  float distance = this->read_distance();
+  Serial.print("distance: ");
+  Serial.println(distance);
+  delay(100);
+  if((int)distance < DISTANCE_LIMIT){
+    return true;
+  }
+  return false;
 }
 
 //============================================================//

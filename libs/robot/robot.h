@@ -3,6 +3,7 @@
 #include "Wire.h"
 #include <MPU6050_light.h>
 #include <Ultrasonic.h>
+#include <ESP32Servo.h>
 
 enum Sensor {
   CENTER_VERTICAL_SENSOR,
@@ -20,6 +21,12 @@ enum RobotState {
   GO_FORWARD
 };
 
+enum WallDirection {
+  RIGHT,
+  LEFT,
+  FRONT
+};
+
 class Robot {
   private:
     int line_sensors_pins[5];
@@ -27,10 +34,12 @@ class Robot {
     int en_m1, en_m2, chan_m1, chan_m2;
     int sensors_threshold, base_pwm_m1, base_pwm_m2;
     int echo_pin, trigger_pin;
+    int servo_pin;
     double kp;
     double previous_rotation_state;
     MPU6050 giroscope;
     Ultrasonic ultrasonic;
+    Servo servo_motor;
 
   public:
     Robot(
@@ -44,7 +53,8 @@ class Robot {
       int chan_m1,
       int chan_m2,
       int echo,
-      int trigger
+      int trigger,
+      int servo
     );
 
     void stop();
@@ -61,7 +71,10 @@ class Robot {
     void rotate_right_90deg();
     void rotate_left_90deg();
     void rotate_180deg();
-    void read_distance();
-};  
+    float read_distance();
+    void servo_rotate_front();
+    bool check_wall(WallDirection d);
+
+};
 
 #endif

@@ -17,6 +17,10 @@
 #define ECHO_PIN  19
 #define TRIGGER_PIN 16
 
+// Servo pin
+#define SERVO_PIN 13
+
+// Instantiating the robot
 Robot robot(
   CENTER_VERTICAL_SENSOR,
   LEFT_SENSOR,
@@ -28,46 +32,86 @@ Robot robot(
   CHA_M1,
   CHA_M2,
   ECHO_PIN,
-  TRIGGER_PIN
+  TRIGGER_PIN,
+  SERVO_PIN
 );
 
+// Setting up========================================//
 void setup() {
   Serial.begin(9600);
   robot.setup();
 }
 
+// Main loop=========================================//
 void loop() {
   robot.read_line_sensors();
   RobotState state = robot.check_line_sensors_states();
-  // Serial.println(state);
 
   switch (state) {
     case GO_FORWARD:
       robot.go_forward();
-    break;
+      break;
 
     case FOUR_WAY_CROSSING:
-      robot.rotate_right_90deg();
+      robot.stop();
+      if(!robot.check_wall(RIGHT)){
+        delay(100);
+        robot.rotate_right_90deg(); 
+      } else if(!robot.check_wall(FRONT)){
+        delay(100);
+        robot.go_forward();  
+      } else if(!robot.check_wall(LEFT)){
+        delay(100);
+        robot.rotate_left_90deg();
+      } else {
+        delay(100);
+        robot.rotate_180deg();
+      }
       robot.go_forward();
       delay(500);
-    break;
-
+      break;
+// 
     case THREE_WAY_CROSSING:
-      robot.rotate_right_90deg();
+      if(!robot.check_wall(RIGHT)){
+        robot.rotate_right_90deg(); 
+      } else if(!robot.check_wall(FRONT)){
+        robot.go_forward();  
+      } else if(!robot.check_wall(LEFT)){
+        robot.rotate_left_90deg();
+      } else {
+        robot.rotate_180deg();
+      }
       robot.go_forward();
       delay(500);
-    break;
+      break;
 
     case TURN_LEFT:
-      robot.rotate_right_90deg();
+      if(!robot.check_wall(RIGHT)){
+        robot.rotate_right_90deg(); 
+      } else if(!robot.check_wall(FRONT)){
+        robot.go_forward();  
+      } else if(!robot.check_wall(LEFT)){
+        robot.rotate_left_90deg();
+      } else {
+        robot.rotate_180deg();
+      }
       robot.go_forward();
       delay(500);
-    break;
+      break;
+
     case TURN_RIGHT:
-      robot.rotate_right_90deg();
+      if(!robot.check_wall(RIGHT)){
+        robot.rotate_right_90deg(); 
+      } else if(!robot.check_wall(FRONT)){
+        robot.go_forward();  
+      } else if(!robot.check_wall(LEFT)){
+        robot.rotate_left_90deg();
+      } else {
+        robot.rotate_180deg();
+      }
       robot.go_forward();
       delay(500);
-    break;
+      break;
 
     default:
       robot.go_forward();
