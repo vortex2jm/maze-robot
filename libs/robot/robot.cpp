@@ -3,11 +3,11 @@
 
 // Right engine - 128 -> 255
 // Left engine - 128 -> 0
-#define KP 0.005        
+#define KP 0.0056
 #define BASE_PWM_M2 91  //81  old values
 #define BASE_PWM_M1 160 //170 old values
 #define ENGINE_STOP 128
-#define THRESHOLD 2000
+#define THRESHOLD 1000
 #define DISTANCE_LIMIT 40
 
 //CONSTRUCTOR============================================================//
@@ -93,7 +93,7 @@ void Robot::rotate_right_90deg(){
   this->giroscope.update();
   this->previous_rotation_state = this->giroscope.getAngleZ();
   double current_angle = this->previous_rotation_state;
-  while(current_angle > (this->previous_rotation_state - 75)){
+  while(current_angle > (this->previous_rotation_state - 70)){
     this->giroscope.update();
     current_angle = this->giroscope.getAngleZ();
     this->set_engine_pwm(this->base_pwm_m2, this->base_pwm_m2);
@@ -106,7 +106,7 @@ void Robot::rotate_left_90deg(){
   this->giroscope.update();
   this->previous_rotation_state = this->giroscope.getAngleZ();
   double current_angle = this->previous_rotation_state;
-  while(current_angle < (this->previous_rotation_state + 75)){
+  while(current_angle < (this->previous_rotation_state + 78)){
     this->giroscope.update();
     current_angle = this->giroscope.getAngleZ();
     this->set_engine_pwm(this->base_pwm_m1, this->base_pwm_m1);
@@ -119,7 +119,7 @@ void Robot::rotate_180deg(){
   this->giroscope.update();
   this->previous_rotation_state = this->giroscope.getAngleZ();
   double current_angle = this->previous_rotation_state;
-  while(current_angle > (this->previous_rotation_state - 165)){
+  while(current_angle > (this->previous_rotation_state - 150)){
     this->giroscope.update();
     current_angle = this->giroscope.getAngleZ();
     this->set_engine_pwm(this->base_pwm_m2, this->base_pwm_m2);
@@ -187,8 +187,8 @@ RobotState Robot::check_line_sensors_states() {
 
   bool is_right_turn = this->is_on_black_cell(this->line_sensors_values[CENTER_RIGHT_SENSOR]);
 
-  if(is_four_way_crossing) return FOUR_WAY_CROSSING;
   if(is_three_way_crossing) return THREE_WAY_CROSSING;
+  if(is_four_way_crossing) return FOUR_WAY_CROSSING;
   if(is_left_turn) return TURN_LEFT;
   if(is_right_turn) return TURN_RIGHT;
   
