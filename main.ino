@@ -44,7 +44,6 @@ void setup() {
 
 // Main loop=========================================//
 void loop() {
-  
   robot.read_line_sensors();
   RobotState state = robot.check_line_sensors_states();
   
@@ -53,7 +52,7 @@ void loop() {
       robot.go_forward();
       break;
 
-    case FOUR_WAY_CROSSING:
+    case CROSSING:
       robot.stop();
       if(!robot.check_wall(RIGHT)){        
         delay(100);
