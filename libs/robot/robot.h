@@ -14,10 +14,7 @@ enum Sensor {
 };
 
 enum RobotState {
-  FOUR_WAY_CROSSING,
-  THREE_WAY_CROSSING,
-  TURN_LEFT,
-  TURN_RIGHT,
+  CROSSING,
   GO_FORWARD
 };
 

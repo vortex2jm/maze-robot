@@ -1,13 +1,13 @@
 #include "robot.h"
 #include <Arduino.h>
 
-// Right engine - 128 -> 255
-// Left engine - 128 -> 0
 #define KP 0.005        
-#define BASE_PWM_M2 91  //81  old values
-#define BASE_PWM_M1 160 //170 old values
+// Right engine - 128 -> 255
+#define BASE_PWM_M1 160 + 3   // 170 old value
+// Left engine - 128 -> 0
+#define BASE_PWM_M2 91 - 3    // 81  old value
 #define ENGINE_STOP 128
-#define THRESHOLD 2000
+#define THRESHOLD 1000
 #define DISTANCE_LIMIT 40
 
 //CONSTRUCTOR============================================================//
@@ -93,7 +93,7 @@ void Robot::rotate_right_90deg(){
   this->giroscope.update();
   this->previous_rotation_state = this->giroscope.getAngleZ();
   double current_angle = this->previous_rotation_state;
-  while(current_angle > (this->previous_rotation_state - 75)){
+  while(current_angle > (this->previous_rotation_state - 71)){
     this->giroscope.update();
     current_angle = this->giroscope.getAngleZ();
     this->set_engine_pwm(this->base_pwm_m2, this->base_pwm_m2);
@@ -106,7 +106,7 @@ void Robot::rotate_left_90deg(){
   this->giroscope.update();
   this->previous_rotation_state = this->giroscope.getAngleZ();
   double current_angle = this->previous_rotation_state;
-  while(current_angle < (this->previous_rotation_state + 75)){
+  while(current_angle < (this->previous_rotation_state + 77)){
     this->giroscope.update();
     current_angle = this->giroscope.getAngleZ();
     this->set_engine_pwm(this->base_pwm_m1, this->base_pwm_m1);
@@ -119,10 +119,10 @@ void Robot::rotate_180deg(){
   this->giroscope.update();
   this->previous_rotation_state = this->giroscope.getAngleZ();
   double current_angle = this->previous_rotation_state;
-  while(current_angle > (this->previous_rotation_state - 165)){
+  while(current_angle > (this->previous_rotation_state - 155)){
     this->giroscope.update();
     current_angle = this->giroscope.getAngleZ();
-    this->set_engine_pwm(this->base_pwm_m2, this->base_pwm_m2);
+    this->set_engine_pwm(this->base_pwm_m2, this->base_pwm_m2-5);
     delay(5);
   }
 }
@@ -173,25 +173,10 @@ void Robot::stop() {
 }
 
 //============================================================//
-RobotState Robot::check_line_sensors_states() {
-  bool is_four_way_crossing = 
-    this->is_on_black_cell(this->line_sensors_values[CENTER_LEFT_SENSOR]) 
-    && this->is_on_black_cell(this->line_sensors_values[CENTER_RIGHT_SENSOR]) 
-    && this->is_on_black_cell(this->line_sensors_values[CENTER_VERTICAL_SENSOR]);
-
-  bool is_three_way_crossing = 
-    this->is_on_black_cell(this->line_sensors_values[CENTER_LEFT_SENSOR])
-    && this->is_on_black_cell(this->line_sensors_values[CENTER_RIGHT_SENSOR]);
-
-  bool is_left_turn = this->is_on_black_cell(this->line_sensors_values[CENTER_LEFT_SENSOR]);
-
-  bool is_right_turn = this->is_on_black_cell(this->line_sensors_values[CENTER_RIGHT_SENSOR]);
-
-  if(is_four_way_crossing) return FOUR_WAY_CROSSING;
-  if(is_three_way_crossing) return THREE_WAY_CROSSING;
-  if(is_left_turn) return TURN_LEFT;
-  if(is_right_turn) return TURN_RIGHT;
-  
+RobotState Robot::check_line_sensors_states() { 
+  if(is_on_black_cell(this->line_sensors_values[CENTER_LEFT_SENSOR])
+  || is_on_black_cell(this->line_sensors_values[CENTER_RIGHT_SENSOR])) 
+    return CROSSING;
   return GO_FORWARD;
 }
 
